@@ -1,4 +1,4 @@
-module TriangularNum (modularHighlyDivisibleTriangNum, recursiveHighlyDivisibleTriangNum) where
+module TriangularNum (modularHighlyDivisibleTriangNum, recursiveHighlyDivisibleTriangNum, tailRecursionHighlyDivisibleTriangNum) where
 
 {- ProjEuler №12:
 What is the value of the first triangle
@@ -33,12 +33,12 @@ countDivisorsFold x =
   where
     sqrtx = flooredIntSqrt x
 
-modularHighlyDivisibleTriangNum :: Int
-modularHighlyDivisibleTriangNum =
+modularHighlyDivisibleTriangNum :: Int -> Int
+modularHighlyDivisibleTriangNum x =
   fst $
     head $
-      dropWhile ((< 500) . snd) $
-        map (\x -> (x, countDivisorsFold x)) triangularSeqInf
+      dropWhile ((<= x) . snd) $
+        map (\y -> (y, countDivisorsFold y)) triangularSeqInf
 
 -- Modular solution end
 
@@ -55,10 +55,32 @@ countDivisorsRecursion x = 2 * go x sqrtx - (if rem x sqrtx == 0 then 1 else 0)
       | divisor == 1 = 1
       | otherwise = (if rem n divisor == 0 then 1 else 0) + go n (divisor - 1) -- Losing tail of recursion
 
-recursiveHighlyDivisibleTriangNum :: Int
-recursiveHighlyDivisibleTriangNum = go 1 2
+recursiveHighlyDivisibleTriangNum :: Int -> Int
+recursiveHighlyDivisibleTriangNum x = go 1 2
   where
-    go prev_triag next_ind = if countDivisorsRecursion new_triag > 500 then new_triag else go new_triag $ next_ind + 1
+    go prev_triag next_ind = if countDivisorsRecursion new_triag > x then new_triag else go new_triag $ next_ind + 1
+      where
+        new_triag = prev_triag + next_ind
+
+-- Regular recursion solution end
+
+{- Tail recursion solution:
+    Tail divisor counter (in a sense, it's a self-written fold)
+    Tail recursive triangular num
+-}
+
+countDivisorsTailRecursion :: Int -> Int
+countDivisorsTailRecursion x = 2 * go x sqrtx 0 - (if rem x sqrtx == 0 then 1 else 0)
+  where
+    sqrtx = flooredIntSqrt x
+    go n divisor accum
+      | divisor == 1 = accum + 1
+      | otherwise = go n (divisor - 1) (if rem n divisor == 0 then accum + 1 else accum)
+
+tailRecursionHighlyDivisibleTriangNum :: Int -> Int
+tailRecursionHighlyDivisibleTriangNum x = go 1 2
+  where
+    go prev_triag next_ind = if countDivisorsTailRecursion new_triag > x then new_triag else go new_triag $ next_ind + 1
       where
         new_triag = prev_triag + next_ind
 

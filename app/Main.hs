@@ -1,6 +1,5 @@
 module Main (main) where
-
-import qualified TriangularNum as TN
+import TriangularNum (tailRecursionHighlyDivisibleTriangNum)
 
 main :: IO ()
-main = print  TN.recursiveHighlyDivisibleTriangNum
+main = print $ tailRecursionHighlyDivisibleTriangNum 500
