@@ -1,13 +1,11 @@
-module TriangularNum (modularHighlyDivisibleTriangNum, countDivisorsFold) where
+module TriangularNum (modularHighlyDivisibleTriangNum, recursiveHighlyDivisibleTriangNum) where
 
-{-
-\** ProjEuler №12:
+{- ProjEuler №12:
 What is the value of the first triangle
 number to have over five hundred divisors?
 -}
 
-{-
-\* Modular solution:
+{- Modular solution:
     Infinite sequence
     Folding
     Mapping
@@ -28,21 +26,40 @@ flooredIntSqrt :: Int -> Int
 flooredIntSqrt = floor . intSqrt
 
 countDivisorsFold :: Int -> Int
-countDivisorsFold x = foldr (\el acc -> if rem x el == 0 then acc + 1 else acc) 0 [1 .. flooredIntSqrt x]
+countDivisorsFold x =
+  (\c -> if rem x sqrtx == 0 then c + 1 else c) $
+    (* 2) $
+      foldr (\el acc -> if rem x el == 0 then acc + 1 else acc) 0 [1 .. sqrtx - 1]
+  where
+    sqrtx = flooredIntSqrt x
 
 modularHighlyDivisibleTriangNum :: Int
-{- The number 251 is here, because each divisor below sqrt X
- has counterpart above sqrt X, albeit sqrt X itself.
- 250 * 2 <= 500 w/ and w/o sqrt X inside
- 251 * 2 > 500 w/ and w/o sqrt X inside -}
-modularHighlyDivisibleTriangNum = fst $ head $ dropWhile ((< 251) . snd) $ map (\x -> (x, countDivisorsFold x)) triangularSeqInf
+modularHighlyDivisibleTriangNum =
+  fst $
+    head $
+      dropWhile ((< 500) . snd) $
+        map (\x -> (x, countDivisorsFold x)) triangularSeqInf
 
 -- Modular solution end
 
-{-
-\* Tail recursion solution:
-    Infinite sequence
-    Folding
-    Mapping
+{- Regular recursion solution:
+    Recusrive divisor counter
+    Tail recursive triangular num
 -}
 
+countDivisorsRecursion :: Int -> Int
+countDivisorsRecursion x = 2 * go x sqrtx - (if rem x sqrtx == 0 then 1 else 0)
+  where
+    sqrtx = flooredIntSqrt x
+    go n divisor
+      | divisor == 1 = 1
+      | otherwise = (if rem n divisor == 0 then 1 else 0) + go n (divisor - 1) -- Losing tail of recursion
+
+recursiveHighlyDivisibleTriangNum :: Int
+recursiveHighlyDivisibleTriangNum = go 1 2
+  where
+    go prev_triag next_ind = if countDivisorsRecursion new_triag > 500 then new_triag else go new_triag $ next_ind + 1
+      where
+        new_triag = prev_triag + next_ind
+
+-- Regular recursion solution end

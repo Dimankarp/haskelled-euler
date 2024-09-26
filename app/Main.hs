@@ -3,4 +3,4 @@ module Main (main) where
 import qualified TriangularNum as TN
 
 main :: IO ()
-main = print  TN.modularHighlyDivisibleTriangNum
+main = print  TN.recursiveHighlyDivisibleTriangNum
