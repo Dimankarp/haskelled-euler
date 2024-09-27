@@ -1,4 +1,6 @@
-module CountingSundays(toDate) where
+module CountingSundays (countSundays, toDate, Date(..)) where
+
+import Data.Foldable (Foldable (foldl'))
 
 {- 1 Jan 1900 was a Monday.
 Thirty days has September,
@@ -26,6 +28,19 @@ toDate y m d = Date days
         + foldr (\a b -> monthToLen a y + b) 0 [1 .. month_offset]
         + days_offset
 
+
+
+weekDayToYearInfo :: Int -> [(Int, Int)]
+weekDayToYearInfo y = map (countSundays y) [0 .. 6]
+  where
+    countSundays year start =
+      foldl'
+        ( \(acc, count) el ->
+            (rem (acc + monthToLen el year) 7, count + if acc == 0 then 1 else 0)
+        )
+        (start, 0)
+        [1 .. 12]
+
 isYearLeap :: (Integral a) => a -> Bool
 isYearLeap y = (rem y 4 == 0 && rem y 100 /= 0) || (rem y 400 == 0)
 
@@ -37,3 +52,10 @@ monthToLen m y = case m of
   11 -> 30
   2 -> if isYearLeap y then 29 else 28
   _ -> 31
+
+countSundays :: Int -> Int -> Int -> Int
+countSundays y1 stWk y2
+  | y1 == y2 = 0
+  | otherwise = count + countSundays (y1 + 1) endWk y2
+  where
+    (endWk, count) = weekDayToYearInfo y1 !! stWk
