@@ -10,9 +10,9 @@ jobs:
       matrix:
         cabal: ["3.10"]
         stack: ["3.1.1"]
-        ghc: ["9.4.8"]
+        ghc: ["9.6.6"]
     env:
-      CONFIG: "--bench --pedantic "
+      CONFIG: "--bench --pedantic  --system-ghc"
     steps:
       - uses: actions/checkout@v4
       - name: Setup Haskell
@@ -37,7 +37,7 @@ jobs:
       - name: "Run HLint"
         uses: haskell-actions/hlint-run@v2
         with:
-          path: src/
+          path: '["src/", "test/", "app/"]'
           fail-on: warning
   tests:
     needs: build
@@ -46,7 +46,9 @@ jobs:
       matrix:
         cabal: ["3.10"]
         stack: ["3.1.1"]
-        ghc: ["9.4.8"]
+        ghc: ["9.6.6"]
+    env:
+      CONFIG: --system-ghc
     steps:
       - uses: actions/checkout@v4
       - name: Setup Haskell
@@ -56,5 +58,5 @@ jobs:
           cabal-version: ${{ matrix.cabal }}
           enable-stack: true
           stack-version: ${{ matrix.stack }}
-      - run: stack build
+      - run: stack build $BUILD
       - run: stack test
