@@ -1,4 +1,4 @@
-module CountingSundays (countSundays, toDate, Date(..)) where
+module CountingSundays (recursiveCountSundays, toDate, Date (..)) where
 
 import Data.Foldable (Foldable (foldl'))
 
@@ -28,8 +28,6 @@ toDate y m d = Date days
         + foldr (\a b -> monthToLen a y + b) 0 [1 .. month_offset]
         + days_offset
 
-
-
 weekDayToYearInfo :: Int -> [(Int, Int)]
 weekDayToYearInfo y = map (countSundays y) [0 .. 6]
   where
@@ -53,9 +51,9 @@ monthToLen m y = case m of
   2 -> if isYearLeap y then 29 else 28
   _ -> 31
 
-countSundays :: Int -> Int -> Int -> Int
-countSundays y1 stWk y2
+recursiveCountSundays :: Int -> Int -> Int -> Int
+recursiveCountSundays y1 stWk y2
   | y1 == y2 = 0
-  | otherwise = count + countSundays (y1 + 1) endWk y2
+  | otherwise = count + recursiveCountSundays (y1 + 1) endWk y2
   where
     (endWk, count) = weekDayToYearInfo y1 !! stWk
