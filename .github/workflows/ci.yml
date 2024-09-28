@@ -58,5 +58,5 @@ jobs:
           cabal-version: ${{ matrix.cabal }}
           enable-stack: true
           stack-version: ${{ matrix.stack }}
-      - run: stack build $BUILD
-      - run: stack test
+      - run: stack build $CONFIG
+      - run: stack test $CONFIG
