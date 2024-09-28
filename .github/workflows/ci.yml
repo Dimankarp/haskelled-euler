@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/**'
+      - 'src/**'
+      - 'app/**'
+      - 'test/**'
+      - '**.yaml'
 jobs:
   build:
     runs-on: ubuntu-latest
